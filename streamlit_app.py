@@ -58,7 +58,7 @@ def plot_perf(rendements, poids, titre):
 
 def section_esg():
     st.header("🌍 Analyse ESG Détaillée")
-    esg_data = pd.read_excel(r"/workspaces/Projet/Finance verte.xlsx")
+    esg_data = pd.read_excel("Finance verte.xlsx")
     
     logo_map = {
         'AB Sagax': r"C:\Users\Popcorn\Downloads\SAGAX_logo_gra-1.jpg",
@@ -237,7 +237,7 @@ st.title("Finance Durable")
 
 @st.cache_data
 def charger_donnees():
-    return pd.read_csv(r"/workspaces/Projet/Data.csv", parse_dates=['Date'], index_col='Date').ffill().dropna(how='all')
+    return pd.read_csv("Data.csv", parse_dates=['Date'], index_col='Date').ffill().dropna(how='all')
 
 df = charger_donnees()
 
