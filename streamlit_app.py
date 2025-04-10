@@ -228,7 +228,8 @@ def section_equipe():
     - **Méthodologie** : Agile
     - **Versionning** : [GitHub Repository](https://github.com/oyduoe/Finance-durable)
     - **Description des fichiers** :
-        - app.py : Code principal de l'application Streamlit
+        - streamlit_app.py : Code principal de l'application Streamlit
+        - requirements.txt : Fichier texte qui liste les dépendances Python nécessaires au projet
         - Data.csv : Fichier contenant les rendements de notre portefeuille
         - Finance durable.xlsx : Detail des actifs de notre portefeuille
     """)
