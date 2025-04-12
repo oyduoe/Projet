@@ -59,19 +59,6 @@ def plot_perf(rendements, poids, titre):
 def section_esg():
     st.header("🌍 Analyse ESG Détaillée")
     esg_data = pd.read_excel("Finance verte.xlsx")
-    
-    logo_map = {
-        'AB Sagax': r"C:\Users\Popcorn\Downloads\SAGAX_logo_gra-1.jpg",
-        'ADMIRAL GROUP PLC': r"C:\Users\Popcorn\Downloads\Admiral.jpg",
-        # Ajouter toutes les entreprises ici...
-    }
-    
-    rating_evolution_map = {
-        'AB Sagax': r"D:\HONOR Share\Screenshot\AB Sagax.bmp",
-        'ADMIRAL GROUP PLC': r"chemin_vers_image_evolution_admiral.bmp",
-        # Ajouter toutes les entreprises ici...
-    }
-
     rating_order = ['CCC', 'B', 'BB', 'BBB', 'A', 'AA', 'AAA']
     rating_colors = {
         'CCC': '#FF6B6B',
@@ -82,11 +69,8 @@ def section_esg():
         'AA': '#A5D6A7',
         'AAA': '#66BB6A'
     }
-    
-    esg_data['Logo'] = esg_data['Companies'].apply(lambda x: logo_map.get(x, r"C:\Users\Popcorn\Downloads\placeholder.png"))
-    esg_data['Rating_Evolution_Image'] = esg_data['Companies'].apply(lambda x: rating_evolution_map.get(x, r"C:\Users\Popcorn\Downloads\placeholder_evolution.png"))
     esg_data['Rating'] = pd.Categorical(esg_data['Ratings_today'], categories=rating_order, ordered=True)
-    
+
     col1, col2, col3 = st.columns([2, 2, 3])
     with col1:
         selected_countries = st.multiselect(
@@ -117,7 +101,6 @@ def section_esg():
         filtered_data = filtered_data[filtered_data['Industry'].isin(selected_sectors)]
     if selected_company:
         filtered_data = filtered_data[filtered_data['Companies'] == selected_company]
-    
     if not filtered_data.empty:
         if selected_company:
             company_data = filtered_data.iloc[0]
@@ -127,17 +110,10 @@ def section_esg():
                 st.markdown(f"""
                 **Pays** : {company_data['Country']} \n
                 **Secteur** : {company_data['Industry']} \n
-                **Rating ESG Actuel** : {company_data['Rating']} \n
+                **Rating ESG** : {company_data['Ratings_today']} ({company_data['Ratings_before']} → {company_data['Ratings_today']}) \n
                 **Description** : {company_data['Description']} \n
                 **Plan ESG** : {company_data['Plan ESG']}
                 """)
-                st.image(company_data['Rating_Evolution_Image'], 
-                        caption="Historique des ratings ESG",
-                        width=400)
-            with col_logo:
-                st.image(company_data['Logo'], 
-                        caption=company_data['Companies'],
-                        width=150)
             st.divider()
         
         with st.expander("Carte géographique des actifs"):
@@ -164,15 +140,12 @@ def section_esg():
                 .style.map(color_ratings, subset=['Rating']),
                 height=500
             )
-        
         with col_metrics:
             st.metric("Meilleur rating", filtered_data['Rating'].max())
             st.metric("Pays le plus représenté", filtered_data['Country'].mode()[0])
             st.metric("Secteur dominant", filtered_data['Industry'].mode()[0])
     else:
         st.warning("Aucun actif ne correspond aux critères sélectionnés")
-
-import streamlit as st
 
 def section_education():
     st.header("🎓 Éducation et Formation en Finance Durable")
@@ -369,13 +342,13 @@ def section_equipe():
     
     col1, col2, col3 = st.columns(3)
     with col1:
-        st.image("https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_1280.png", width=150)
+        st.image("https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_1280.png", use_column_width=True)
         st.markdown("**Justine Marquaille**")
     with col2:
-        st.image("https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_1280.png", width=150)
+        st.image("https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_1280.png", use_column_width=True)
         st.markdown("**Zhetian Hua**")
     with col3:
-        st.image("Karine.jpg", width=150)
+        st.image("Karine.jpg", use_column_width=True)
         st.markdown("**Karine Sun**")
     
     st.markdown("""
@@ -400,14 +373,12 @@ def charger_donnees():
 
 df = charger_donnees()
 
-# Menu de navigation
 page = st.sidebar.selectbox("Navigation", 
                            ["Analyse ESG",
                             "Optimisation Portefeuille", 
                             "Éducation Financière",
                             "Notre Équipe"])
 
-# Gestion des pages
 if page == "Optimisation Portefeuille":
     st.header("📈 Optimisation Portefeuille")
     st.write("Quel est votre objectif d'investissement ?")
