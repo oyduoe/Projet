@@ -5,27 +5,72 @@ import matplotlib.pyplot as plt
 from scipy.optimize import minimize
 import plotly.express as px
 
-RISK_AVERSION = 0.9
-RETURN_TARGET_WEIGHT = 0.2
-TAUX_SANS_RISQUE = 0.04
-SEUIL_PONDERATION = 1e-4
+RISK_AVERSION = 0.9 # Contrôle le compromis rendement/risque (0 = pur rendement, 1 = plus prudent)
+RETURN_TARGET_WEIGHT = 0.2 # Poids du rendement dans l'optimisation de volatilité
+TAUX_SANS_RISQUE = 0.04 # Taux pour le ratio de sharpe
+SEUIL_PONDERATION = 1e-4 # 0.01% de poids minimum pour afficher un actif
+ALPHA = 0.2 # Rendement
+GAMMA = 0.9 # Notes subjectives
 
-def optimiser_portefeuille(df, mode='max_rendement'):
+ESG_dict = {
+    "EQT": 2,
+    "SAGA-B.ST": 2,
+    "ACGBY": 2,
+    "ATEYY": 2,
+    "2395.TW": 2,
+    "ADM.L": 3,
+    "AFL": 2,
+    "ANET": 2,
+    "ARES": 2,
+    "ACGL": 2,
+    "300999.SZ": 4,
+    "AU": 3,
+    "AIR.PA": 2,
+    "2618.TW": 2,
+    "AON": 2,
+    "A17U.SI": 2,
+    "TEMN.SW": 2,
+    "HOLN.SW": 2,
+    "2802.T": 2,
+    "MB.MI": 4,
+    "BAMI.MI": 2,
+    "PST.MI": 2,
+    "ALE.WA": 4,
+    "AVB": 2,
+    "AVY": 3,
+    "2588.HK": 2,
+    "INDIGO.NS": 2,
+    "9202.T": 2,
+    "KMI": 3
+}
+
+def optimiser_portefeuille(df, mode='max_rendement', notes=None, max_poids_par_actif=0.25):
     nb_actifs = df.shape[1]
     matrice_cov = df.cov() * 252
     rendements_annualises = df.mean() * 252
     
     contraintes = [{'type': 'eq', 'fun': lambda w: np.sum(w) - 1}]
-    bornes = [(0, 1) for _ in range(nb_actifs)]
-    poids_initiaux = np.ones(nb_actifs)/nb_actifs
+    bornes = [(0, max_poids_par_actif) for _ in range(nb_actifs)]
+    poids_initiaux = np.ones(nb_actifs) / nb_actifs
     
-    if mode == 'max_rendement':
+    if mode == 'max_rendement': # Objectif : Max(rendement) - λ*Risque
         def objectif(w):
             return -(w @ rendements_annualises - RISK_AVERSION * np.sqrt(w.T @ matrice_cov @ w))
         
-    elif mode == 'min_volatilite':
+    elif mode == 'min_volatilite': # Objectif : Min(volatilité) - γ*Rendement
         def objectif(w):
             return (np.sqrt(w.T @ matrice_cov @ w) - RETURN_TARGET_WEIGHT * (w @ rendements_annualises))
+    
+    elif mode == 'esg' and notes is not None:
+        notes_vecteur = np.array([notes[col] for col in df.columns])
+        def objectif(w):
+            rendement = w @ rendements_annualises
+            risque = np.sqrt(w.T @ matrice_cov @ w)
+            score = w @ notes_vecteur
+            return -(ALPHA * rendement - RISK_AVERSION * risque + GAMMA * score)
+    
+    elif mode == 'egale_pondere':
+        return poids_initiaux
     
     resultat = minimize(objectif, poids_initiaux, method='SLSQP', bounds=bornes, constraints=contraintes)
     
@@ -369,7 +414,7 @@ st.title("Finance Durable")
 
 @st.cache_data
 def charger_donnees():
-    return pd.read_csv("Data.csv", parse_dates=['Date'], index_col='Date').ffill().dropna(how='all')
+    return pd.read_csv("Data.csv", index_col=0, parse_dates=True)
 
 df = charger_donnees()
 
@@ -383,35 +428,77 @@ if page == "Optimisation Portefeuille":
     st.header("📈 Optimisation Portefeuille")
     st.write("Quel est votre objectif d'investissement ?")
 
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        btn_max_ret = st.button('Maximiser le rendement')
-    with col2:
-        btn_min_vol = st.button('Minimiser la volatilité')
-    with col3:
-        btn_esg = st.button('ESG (à venir)')
+    st.markdown("""
+    <style>
+        div[data-testid="column"] {
+            gap: 0.5rem;
+        }
+        .stButton > button {
+            width: 100%;
+            white-space: nowrap;
+        }
+    </style>
+    """, unsafe_allow_html=True)
 
-    if btn_max_ret:
+    if 'mode_selectionne' not in st.session_state:
+        st.session_state.mode_selectionne = None
+
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
+        if st.button('Maximiser rendement'):
+            st.session_state.mode_selectionne = 'max_rendement'
+    with col2:
+        if st.button('Minimiser volatilité'):
+            st.session_state.mode_selectionne = 'min_volatilite'
+    with col3:
+        if st.button('ESG'):
+            st.session_state.mode_selectionne = 'esg'
+    with col4:
+        if st.button('Personnalisable'):
+            st.session_state.mode_selectionne = 'egale_pondere'
+
+    mode = st.session_state.mode_selectionne
+
+    if mode == 'max_rendement':
         poids = optimiser_portefeuille(df, 'max_rendement')
         metriques, actifs = analyser_portefeuille(df, poids)
-        
-        st.subheader("Portefeuille - Maximisation du rendement")
+        st.subheader("📈 Portefeuille - Maximisation du rendement")
         st.dataframe(metriques)
         st.dataframe(actifs)
         st.pyplot(plot_perf(df, poids, 'Performance - Rendement Maximisé'))
 
-    if btn_min_vol:
+    elif mode == 'min_volatilite':
         poids = optimiser_portefeuille(df, 'min_volatilite')
         metriques, actifs = analyser_portefeuille(df, poids)
-        
-        st.subheader("Portefeuille - Minimisation de la volatilité")
+        st.subheader("📉 Portefeuille - Minimisation de la volatilité")
         st.dataframe(metriques)
         st.dataframe(actifs)
         st.pyplot(plot_perf(df, poids, 'Performance - Volatilité Minimisée'))
 
-    if btn_esg:
-        st.write("Fonctionnalité ESG en cours de développement...")
-    
+    elif mode == 'esg':
+        poids = optimiser_portefeuille(df, 'esg', ESG_dict)
+        metriques, actifs = analyser_portefeuille(df, poids)
+        st.subheader("🌱 Portefeuille - ESG")
+        st.dataframe(metriques)
+        st.dataframe(actifs)
+        st.pyplot(plot_perf(df, poids, 'Performance - ESG'))
+
+    elif mode == 'egale_pondere':
+        st.subheader("Sélectionnez les entreprises pour votre portefeuille personnalisé")
+        actifs_disponibles = df.columns.tolist()
+        entreprises_choisies = st.multiselect("Choisissez les actifs :", options=actifs_disponibles)
+
+        if entreprises_choisies:
+            df_selection = df[entreprises_choisies].dropna()
+            poids = optimiser_portefeuille(df_selection, 'egale_pondere')
+            metriques, actifs = analyser_portefeuille(df_selection, poids)
+            st.subheader("⚖️ Portefeuille - Pondération Égale Personnalisée")
+            st.dataframe(metriques)
+            st.dataframe(actifs)
+            st.pyplot(plot_perf(df_selection, poids, 'Performance - Personnalisé'))
+        else:
+            st.info("Veuillez sélectionner au moins un actif.")
+
 elif page == "Analyse ESG":
     section_esg()
     
