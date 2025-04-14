@@ -387,13 +387,13 @@ def section_equipe():
     
     col1, col2, col3 = st.columns(3)
     with col1:
-        st.image("https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_1280.png", use_column_width=True)
+        st.image("https://api.dicebear.com/7.x/initials/svg?seed=Justine+Marquaille", use_column_width=True)
         st.markdown("**Justine Marquaille**")
     with col2:
-        st.image("https://cdn.pixabay.com/photo/2016/08/08/09/17/avatar-1577909_1280.png", use_column_width=True)
+        st.image("https://api.dicebear.com/7.x/initials/svg?seed=Zhetian+Hua", use_column_width=True)
         st.markdown("**Zhetian Hua**")
     with col3:
-        st.image("Karine.jpg", use_column_width=True)
+        st.image("https://api.dicebear.com/7.x/initials/svg?seed=Karine+Sun", use_column_width=True)
         st.markdown("**Karine Sun**")
     
     st.markdown("""
