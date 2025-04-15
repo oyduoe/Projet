@@ -485,11 +485,13 @@ if page == "Optimisation Portefeuille":
 
     elif mode == 'egale_pondere':
         st.subheader("Sélectionnez les entreprises pour votre portefeuille personnalisé")
-        actifs_disponibles = df.columns.tolist()
-        entreprises_choisies = st.multiselect("Choisissez les actifs :", options=actifs_disponibles)
-
-        if entreprises_choisies:
-            df_selection = df[entreprises_choisies].dropna()
+        esg_data = pd.read_excel("Finance verte.xlsx")
+        esg_filtered = esg_data[esg_data['Tickers'].isin(df.columns)]
+        noms_disponibles = sorted(esg_filtered['Companies'].unique())
+        entreprises_choisies = st.multiselect("Choisissez les actifs :", options=noms_disponibles)
+        tickers_choisis = esg_filtered[esg_filtered['Companies'].isin(entreprises_choisies)]['Tickers'].tolist()
+        if tickers_choisis:
+            df_selection = df[tickers_choisis].dropna()
             poids = optimiser_portefeuille(df_selection, 'egale_pondere')
             metriques, actifs = analyser_portefeuille(df_selection, poids)
             st.subheader("⚖️ Portefeuille - Pondération Égale Personnalisée")
