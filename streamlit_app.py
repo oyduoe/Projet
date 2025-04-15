@@ -398,16 +398,16 @@ def section_equipe():
     
     st.markdown("""
     ### 📂 Collaboration
-    - **Méthodologie** : Le réchauffement climatique et les défis liés aux critères ESG (Environnement, Social et Gouvernance) sont des enjeux mondiaux. C’est pourquoi nous ne voulons pas simplement valoriser – et donc investir – dans les entreprises qui font déjà ce que toutes les autres devraient faire. La finance est un levier qui permet de choisir quelles entreprises nous souhaitons soutenir et quelles entreprises nous voulons voir prospérer à l’avenir.<br>
-    Nous avons choisi d’aider celles qui font de réels efforts. Nous mettons l’accent sur l’effort et l’amélioration, et non uniquement sur les résultats. Il est toujours plus facile d’avoir des émissions de gaz à effet de serre quasi nulles quand on vend des gobelets réutilisables. Les choses sont bien plus complexes quand on évolue, par exemple, dans le secteur pétrolier.<br>
-    C’est pourquoi nous nous concentrons sur les entreprises qui polluent beaucoup, mais qui investissent également massivement dans les initiatives ESG. Par ailleurs, l’ESG concerne avant tout la transition, et pour mettre en place une transition globale, il faut que tout le monde participe.
-    - **Choix des entreprises** : Nous nous basons sur la méthodologie ESG mondiale de MSCI et analysons l’évolution de leur notation au cours des dernières années. Les notes vont de CCC à AAA. Les entreprises faisant partie de notre portefeuille sont celles qui ont connu une amélioration d’au moins deux crans entre leur note précédente et leur note actuelle.
-    - **Versionning** : [GitHub Repository](https://github.com/oyduoe/Finance-durable)
+    - **Méthodologie** : Le réchauffement climatique et les défis ESG sont un problème mondial. C'est pourquoi nous ne voulons pas nous contenter de valoriser et donc d'investir dans des entreprises qui font déjà ce que toutes les autres devraient faire. La finance est un moyen de choisir les entreprises que nous voulons aider et celles que nous voulons voir dans le futur. Nous avons choisi d'aider celles qui font de grands efforts. Nous nous concentrons sur l'effort et l'amélioration, et non sur le résultat. On a appelé cette méthodologie Best-Effort. Il est toujours facile d'avoir des émissions de gaz proches de zéro lorsque vous vendez des gobelets réutilisables. Les choses sont beaucoup plus difficiles lorsque vous travaillez dans le secteur pétrolier, par exemple. C'est pourquoi nous nous concentrons sur les entreprises qui polluent beaucoup mais qui investissent beaucoup dans les questions ESG. En outre, l'ESG est une question de transition, et pour mettre en œuvre une transition mondiale, nous avons besoin de l'implication de tous.
+    - **Choix des entreprises** : Nous nous appuyons sur la méthodologie ESG globale de MSCI et analysons l'amélioration de la notation au cours des dernières années. Les notes vont de CCC à AAA. Les entreprises qui font partie de notre univers d’investissement sont celles qui se sont améliorées d'au moins deux niveaux entre la notation précédente et celle d'aujourd'hui. Un de nos portefeuille (le troisième) a d’ailleurs été construit pour investir dans les entreprises qui avaient produit le plus d’efforts, c’est-à-dire qui ont fourni un gros effort et donc ont vu une nette amélioration dans leur notation.
+    - **Versionning** : [GitHub Repository](https://github.com/oyduoe/Projet)
     - **Description des fichiers** :
+        - Finance verte.xlsx : Fichier détaillant les actifs du portefeuille, incluant notamment des informations sur leur classification selon des critères de finance durable
+        - Devise.csv : Fichier contenant les taux de change des différentes devises utilisées dans le portefeuille. Il permet de convertir les prix des actifs dans une devise commune : l'Euro
+        - Data.csv : Fichier contenant les rendements historiques des actifs composant le portefeuille. Il est utilisé pour analyser la performance d'un portefeuille
+        - data.py : Script Python qui récupère les prix des actifs via l’API Yahoo Finance, convertit les prix en euros à l’aide du fichier Devise.csv, calcule les rendements et génère Data.csv
         - streamlit_app.py : Code principal de l'application Streamlit
-        - requirements.txt : Fichier texte qui liste les dépendances Python nécessaires au projet
-        - Data.csv : Fichier contenant les rendements de notre portefeuille
-        - Finance durable.xlsx : Detail des actifs de notre portefeuille
+        - requirements.txt : Fichier texte listant toutes les dépendances Python nécessaires pour faire tourner l’application
     """, unsafe_allow_html=True)
 
 st.title("Finance Durable")
